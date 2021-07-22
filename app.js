@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var axios = require('axios');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -24,8 +25,31 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'build')));
 
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// app.get('/*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
+
+app.get('/recipes', (req, res) => {
+
+  var recipesHandler = (errorCB, successCB) => {
+    const foodysData = {};
+    axios({
+      method: 'get',
+      url: "https://foodys-api.herokuapp.com/recipes"
+    })
+      .then((response) => {
+        foodysData.recipes = response.data
+        successCB(foodysData);
+      })
+      .catch((response) => {
+        errorCB(response);
+      });
+  };
+
+  recipesHandler((err) => {
+    res.status(404);
+    res.end();
+  }, (data) => res.status(200).send(data));
 });
 
 // catch 404 and forward to error handler
