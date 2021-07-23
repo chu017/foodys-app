@@ -1,1 +1,3 @@
-# foodys-test
+# foodys-app
+
+## about
